@@ -21,9 +21,11 @@ func GetEnvs() (l net.Listener, ppid int, err error) {
 	if _, err = fmt.Sscan(os.Getenv("GOAGAIN_PPID"), &ppid); nil != err {
 		return
 	}
-	l, err = Listener()
+	l, err = Listener(Dummy)
 	return
 }
+
+func Dummy() {}
 
 // Send SIGQUIT to the given ppid in order to complete the handoff to the
 // child process.

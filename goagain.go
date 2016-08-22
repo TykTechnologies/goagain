@@ -15,6 +15,8 @@ import (
 
 type strategy int
 
+var OnForkHook func()
+
 const (
 	// The Single-exec strategy: parent forks child to exec with an inherited
 	// net.Listener; child kills parent and becomes a child of init(8).
@@ -165,7 +167,8 @@ func Kill() error {
 
 // Reconstruct a net.Listener from a file descriptior and name specified in the
 // environment.  Deal with Go's insistence on dup(2)ing file descriptors.
-func Listener() (l net.Listener, err error) {
+func Listener(forkHook func()) (l net.Listener, err error) {
+	OnForkHook = forkHook
 	var fd uintptr
 	if _, err = fmt.Sscan(os.Getenv("GOAGAIN_FD"), &fd); nil != err {
 		return
@@ -239,6 +242,7 @@ func Wait(l net.Listener) (syscall.Signal, error) {
 		// SIGUSR2 forks and re-execs the first time it is received and execs
 		// without forking from then on.
 		case syscall.SIGUSR2:
+			OnForkHook()
 			if forked {
 				return syscall.SIGUSR2, nil
 			}
