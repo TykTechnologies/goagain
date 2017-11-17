@@ -1,8 +1,8 @@
 package main
 
 import (
-	"github.com/rcrowley/goagain"
 	"fmt"
+	"github.com/rcrowley/goagain"
 	"log"
 	"net"
 	"syscall"
